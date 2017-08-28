@@ -61,6 +61,6 @@ if [[ "$summary" == 'y' ]] ; then
 fi
 
 sort -Vo "$tmpfile" "$tmpfile"
-/usr/bin/cp "$tmpfile" "$write_file"
+cat "$tmpfile" >> "$write_file"
 
 rm "$tmpfile"

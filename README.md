@@ -20,10 +20,6 @@ example 2: -r '{192.168.{0..255}.{1..254},10.0.{1,2}.{1..254}}'
 Print a hardware vendor summary based on MAC address OUIs. Will be printed last on the console, but listed
 first in the written file specified by -w.
 
-## -v
-Verbose output. With this switch output will print devices excluded by OUI with -x or by MAC with -X. 
-Non-verbose output does not print these devices. Using verbose output is recommended. 
-
 ## -w <write_file>
 The file to write the output to. If not given, output to stdout only.
 

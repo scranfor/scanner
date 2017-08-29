@@ -4,18 +4,16 @@
 # Use the dos2unix program to correct Windows-style linebreaks (\r\n) to Unix-style (\n) on these files before use.
 
 summary='n'
-verbose='n'
 write_file='/dev/null'
 
 # TODO: add some error checking (eg, if -o specified exit 1 if file doesn't exist or not specified)
 
-while getopts ":a:o:r:svw:x:X:" opt; do
+while getopts ":a:o:r:sw:x:X:" opt; do
 	case $opt in
 		a)	asset_file="$OPTARG" ;;
 		o)	oui_file="$OPTARG" ;;
 		r)	ip_range="$OPTARG" ;;
 		s)	summary='y' ;;
-		v)	verbose='y' ;;
 		w)	write_file="$OPTARG" ;;
 		x)	exclude_oui="$(tr -d : <<< $OPTARG)" ;;
 		X)	exclude_macs_file="$OPTARG" ;;
@@ -44,13 +42,7 @@ while read ip ; do
 		[[ -z "${vendor// }" ]] && vendor='Unknown_Vendor'
 		grep -qi $mac "$asset_file" && presence="Present" || presence="Absent"
 
-		if [[ "$verbose" = 'y' ]] ; then
-			printf "%s\t%s\t%s\t%s\tOUI_Excluded:%s\tMAC_Excluded:%s\t(%s)\t%s\n" $ip $mac $(date -Is) $presence $oui_excluded $mac_excluded "$vendor" "$hostname" | tee -a "$tmpfile"
-		else
-			if [[ "$mac_excluded" = "n" && "$oui_excluded" = "n" ]] ; then
-				printf "%s\t%s\t%s\t%s\t(%s)\t%s\n" $ip $mac $(date -Is) $presence "$vendor" "$hostname" | tee -a "$tmpfile"
-			fi
-		fi
+		printf "%s\t%s\t%s\t%s\tOUI_Excluded:%s\tMAC_Excluded:%s\t(%s)\t%s\n" $ip $mac $(date -Is) $presence $oui_excluded $mac_excluded "$vendor" "$hostname" | tee -a "$tmpfile"
 	fi	
 done <<< "$(tr ' ' '\n' <<< $(eval echo $ip_range))"
 

@@ -3,17 +3,15 @@
 # Note: input files (asset_file, exclude_macs_file) may be sensitive to non-Unix style line breaks. 
 # Use the dos2unix program to correct Windows-style linebreaks (\r\n) to Unix-style (\n) on these files before use.
 
-summary='n'
 write_file='/dev/null'
 
 # TODO: add some error checking (eg, if -o specified exit 1 if file doesn't exist or not specified)
 
-while getopts ":a:o:r:sw:x:X:" opt; do
+while getopts ":a:o:r:w:x:X:" opt; do
 	case $opt in
 		a)	asset_file="$OPTARG" ;;
 		o)	oui_file="$OPTARG" ;;
 		r)	ip_range="$OPTARG" ;;
-		s)	summary='y' ;;
 		w)	write_file="$OPTARG" ;;
 		x)	exclude_oui="$(tr -d : <<< $OPTARG)" ;;
 		X)	exclude_macs_file="$OPTARG" ;;
@@ -46,13 +44,7 @@ while read ip ; do
 	fi	
 done <<< "$(tr ' ' '\n' <<< $(eval echo $ip_range))"
 
-if [[ "$summary" == 'y' ]] ; then
-	printf "===== Begin Hardware Vendor Summary =====\n" | tee -a "$write_file"
-	awk '{print $(NF-1)}' "$tmpfile" | sort | uniq -c | tee -a "$write_file"
-	printf "===== End Hardware Vendor Summary =====\n" | tee -a "$write_file"
-fi
-
 sort -Vo "$tmpfile" "$tmpfile"
-cat "$tmpfile" >> "$write_file"
+cp "$tmpfile" "$write_file"
 
 rm "$tmpfile"

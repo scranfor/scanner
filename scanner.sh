@@ -5,8 +5,6 @@
 
 write_file='/dev/null'
 
-# TODO: add some error checking (eg, if -o specified exit 1 if file doesn't exist or not specified)
-
 while getopts ":a:o:r:w:x:X:" opt; do
 	case $opt in
 		a)	asset_file="$OPTARG" ;;
@@ -21,6 +19,8 @@ done
 [[ -z "$asset_file" ]]						&& { >&2 echo Must specify '-a <asset_file>'.	; exit 1 ; }
 [[ -f "$asset_file" ]]						|| { >&2 echo '<asset_file> does not exist.'	; exit 1 ; }
 [[ -z "$ip_range" ]]						&& { >&2 echo Must specify '-r <ip_range>'.		; exit 1 ; }
+[[ -f "$oui_file" ]]						|| { >&2 echo '<oui_file> does not exist.'		; exit 1 ; }
+[[ -f "$write_file" ]]						&& { >&2 echo '<write_file> already exists.'	; exit 1 ; }
 
 tmpfile=$(mktemp /tmp/scanner.XXXXXXXXXX) || { >&2 echo "Could not create temporary file" ; exit 1 ; }
 

@@ -21,7 +21,7 @@ Print a hardware vendor summary based on MAC address OUIs. Will be printed last 
 first in the written file specified by -w.
 
 ## -w <write_file>
-The file to write the output to. If not given, output to stdout only.
+The file to write the output to. If not given, output to stdout only. If given, the file must not already exist. 
 
 ## -x <exclude_oui>
 A list of OUIs to mark as excluded, separated by commas. Not case sensitive. Example: "-x '00:00:5e,5c:5e:ab'". 

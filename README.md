@@ -16,13 +16,6 @@ A range of IP addresses to scan, in the form of a shell brace expansion. <ip_ran
 example 1: -r '192.168.0.{1..20}'
 example 2: -r '{192.168.{0..255}.{1..254},10.0.{1,2}.{1..254}}'
 
-## -s
-Print a hardware vendor summary based on MAC address OUIs. Will be printed last on the console, but listed
-first in the written file specified by -w.
-
-## -w <write_file>
-The file to write the output to. If not given, output to stdout only. If given, the file must not already exist. 
-
 ## -x <exclude_oui>
 A list of OUIs to mark as excluded, separated by commas. Not case sensitive. Example: "-x '00:00:5e,5c:5e:ab'". 
 A potential use is to exlude all VoIP phones, which probably all share the same OUI.

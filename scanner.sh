@@ -3,41 +3,34 @@
 # Note: input files (asset_file, exclude_macs_file) may be sensitive to non-Unix style line breaks. 
 # Use the dos2unix program to correct Windows-style linebreaks (\r\n) to Unix-style (\n) on these files before use.
 
-write_file='/dev/null'
-
-MKTEMP=/bin/mktemp
 ARPING=/sbin/arping
 SED=/bin/sed
 TR=/bin/tr
 CUT=/bin/cut
 DIG=/bin/dig
 GREP=/bin/grep
-TEE=/bin/tee
-SORT=/bin/sort
-CP=/bin/cp
-RM=/bin/rm
 DATE=/bin/date
 
-while getopts ":a:o:r:w:x:X:" opt; do
+while getopts ":a:i:o:r:sx:X:" opt; do
 	case $opt in
 		a)	asset_file="$OPTARG" ;;
+		i)	ip="$OPTARG" ;;
 		o)	oui_file="$OPTARG" ;;
 		r)	ip_range="$OPTARG" ;;
-		w)	write_file="$OPTARG" ;;
+		s)	scan='y' ;;
 		x)	exclude_oui="$(tr -d : <<< $OPTARG)" ;;
 		X)	exclude_macs_file="$OPTARG" ;;
 	esac
 done
 
-[[ -z "$asset_file" ]]						&& { >&2 echo Must specify '-a <asset_file>'.	; exit 1 ; }
-[[ -f "$asset_file" ]]						|| { >&2 echo '<asset_file> does not exist.'	; exit 1 ; }
-[[ -z "$ip_range" ]]						&& { >&2 echo Must specify '-r <ip_range>'.		; exit 1 ; }
-[[ -f "$oui_file" ]]						|| { >&2 echo '<oui_file> does not exist.'		; exit 1 ; }
-[[ -f "$write_file" ]]						&& { >&2 echo '<write_file> already exists.'	; exit 1 ; }
+if [[ "$scan" != 'y' ]] ; then
+	[[ -z "$asset_file" ]]						&& { >&2 echo Must specify '-a <asset_file>'.	; exit 1 ; }
+	[[ -f "$asset_file" ]]						|| { >&2 echo "<asset_file> $asset_file does not exist."	; exit 1 ; }
+	[[ -z "$ip_range" ]]						&& { >&2 echo Must specify '-r <ip_range>'.		; exit 1 ; }
+	[[ -f "$oui_file" ]]						|| { >&2 echo '<oui_file> does not exist.'		; exit 1 ; }
+fi
 
-tmpfile=$($MKTEMP /tmp/scanner.XXXXXXXXXX) || { >&2 echo "Could not create temporary file" ; exit 1 ; }
-
-while read ip ; do
+scan() {
 	if output=$($ARPING -f -w 2 $ip) ; then
 		mac=$($SED -n 's:.*\[\(.*\)].*:\1:p' <<< $output)
 		oui=$($TR -d : <<< $mac | $CUT -c 1-6)
@@ -52,13 +45,17 @@ while read ip ; do
 		[[ -f "$oui_file" ]] && vendor=$($GREP $oui "$oui_file" | $CUT -c 8-100 | $TR -s ' ' | $TR ' ' '_') || vendor=''
 		[[ -z "${vendor// }" ]] && vendor='Unknown_Vendor'
 		$GREP -qi $mac "$asset_file" && presence="Present" || presence="Absent"
-
 		printf "%s\t%s\t%s\t%s\tOUI_Excluded:%s\tMAC_Excluded:%s\t(%s)\t%s\n" \
-			$ip $mac $($DATE -Is) $presence $oui_excluded $mac_excluded "$vendor" "$hostname" | $TEE -a "$tmpfile"
+			$ip $mac $($DATE -Is) $presence $oui_excluded $mac_excluded "$vendor" "$hostname"
 	fi	
-done <<< "$($TR ' ' '\n' <<< $(eval echo $ip_range))"
+}
 
-$SORT -Vo "$tmpfile" "$tmpfile"
-$CP "$tmpfile" "$write_file"
+[[ "$scan" == 'y' ]] && { scan "$ip" ; exit $? ; }
 
-$RM "$tmpfile"
+export asset_file
+export ip_range
+export oui_file
+export exclude_oui
+export exclude_macs_file
+
+echo "$(eval echo $ip_range)" | tr ' ' '\n' | xargs -n 1 -P 50 /bin/bash "$0" -s -i

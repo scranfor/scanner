@@ -58,4 +58,4 @@ export oui_file
 export exclude_oui
 export exclude_macs_file
 
-echo "$(eval echo $ip_range)" | tr ' ' '\n' | xargs -n 1 -P 50 /bin/bash "$0" -s -i
+echo "$(eval echo $ip_range)" | tr ' ' '\n' | xargs -n 1 -P 150 /bin/bash "$0" -s -i

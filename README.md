@@ -7,6 +7,9 @@ the presence or absense of a MAC address in the file. "Present" implies you know
 expect it to show up on your network. "Absent" implies someone may have bought a new machine, started using it,
 and the user / purchasing officer / etc. never told you about it.
 
+## -e <email_address>
+The email address to send to when a MAC you want to watch for is found active. Does nothing if -w is not specified.
+
 ## -o <oui_file>
 Specify a file conforming to the format of 'nmap-mac-prefixes' to look up vendors based on the MAC address OUI.
 If this switch is ommitted, no vendor lookup will be performed. 
@@ -15,6 +18,10 @@ If this switch is ommitted, no vendor lookup will be performed.
 A range of IP addresses to scan, in the form of a shell brace expansion. <ip_range> MUST BE IN QUOTES!
 example 1: -r '192.168.0.{1..20}'
 example 2: -r '{192.168.{0..255}.{1..254},10.0.{1,2}.{1..254}}'
+
+## -w <watchfor_file>
+A file containing a list of MAC addresses to watch out for. If the scanner finds an active MAC that is in
+that file, it will send an email to the address specified by -e. 
 
 ## -x <exclude_oui>
 A list of OUIs to mark as excluded, separated by commas. Not case sensitive. Example: "-x '00:00:5e,5c:5e:ab'". 

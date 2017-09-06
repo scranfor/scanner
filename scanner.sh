@@ -10,18 +10,23 @@ CUT=/bin/cut
 DIG=/bin/dig
 GREP=/bin/grep
 DATE=/bin/date
+MAIL=/usr/bin/mail
 
-while getopts ":a:i:o:r:sx:X:" opt; do
+while getopts ":a:e:i:o:r:sw:x:X:" opt; do
 	case $opt in
 		a)	asset_file="$OPTARG" ;;
+		e)	email="$OPTARG" ;;
 		i)	ip="$OPTARG" ;;
 		o)	oui_file="$OPTARG" ;;
 		r)	ip_range="$OPTARG" ;;
 		s)	scan='y' ;;
+		w)	watchfor_file="$OPTARG" ;;
 		x)	exclude_oui="$(tr -d : <<< $OPTARG)" ;;
 		X)	exclude_macs_file="$OPTARG" ;;
 	esac
 done
+
+# TODO: add error checking for options -e and -w. Specifically, -e is required if using -w.
 
 if [[ "$scan" != 'y' ]] ; then
 	[[ -z "$asset_file" ]]						&& { >&2 echo Must specify '-a <asset_file>'.	; exit 1 ; }
@@ -47,6 +52,10 @@ scan() {
 		$GREP -qi $mac "$asset_file" && presence="Present" || presence="Absent"
 		printf "%s\t%s\t%s\t%s\tOUI_Excluded:%s\tMAC_Excluded:%s\t(%s)\t%s\n" \
 			$ip $mac $($DATE -Is) $presence $oui_excluded $mac_excluded "$vendor" "$hostname"
+		if $GREP -qi $mac "$watchfor_file" ; then
+			mailmsg=$(printf "The MAC address $mac ($vendor) was just seen active as $ip ($hostname).\n\nThis message sent by the script $0 on $HOSTNAME")
+			$MAIL -s "Scanner alert for MAC address: $mac" "$email" <<< "$mailmsg"
+		fi
 	fi	
 }
 
@@ -57,5 +66,7 @@ export ip_range
 export oui_file
 export exclude_oui
 export exclude_macs_file
+export email
+export watchfor_file
 
 echo "$(eval echo $ip_range)" | tr ' ' '\n' | xargs -n 1 -P 150 /bin/bash "$0" -s -i

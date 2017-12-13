@@ -1,3 +1,29 @@
+# Summary
+
+This simple scanner uses ARP (via arping) to discover devices on a network. It should be able to discover devices even with the most restrictive firewall rules, as if the host doesn't reply to ARP requests, it effectively cannot use the network at all.
+
+This script should work on RHEL / CentOS 7. Modifications are necessary for other distributions.
+
+Make sure you have the few prerequisite packages installed:
+
+`yum install bind-utils iputils git -y`
+
+# Example
+
+A very simple example:
+
+`git clone https://github.com/scranfor/scanner.git`
+
+`cd scanner`
+
+`wget https://svn.nmap.org/nmap/nmap-mac-prefixes -O nmap-mac-prefixes`
+
+`touch empty-file`
+
+`./scanner.sh -a empty-file.txt -o nmap-mac-prefixes -X empty-file.txt -r '192.168.{0..255}.{0..255}' | tee scan-output.txt`
+
+This will scan the 65k IP addresses of 192.168.0.0/16. It will take roughly 22 minutes, and will generate roughly 11MB of network traffic.
+
 # Description of options
 
 ## -a <asset_file>
@@ -17,7 +43,7 @@ If this switch is ommitted, no vendor lookup will be performed.
 ## -r <ip_range>
 A range of IP addresses to scan, in the form of a shell brace expansion. <ip_range> MUST BE IN SINGLE QUOTES!
 example 1: -r '192.168.0.{1..20}'
-example 2: -r '{192.168.{0..255}.{1..254},10.0.{1,2}.{1..254}}'
+example 2: -r '{192.168.{0..255}.{0..255},10.0.{1,2}.{1..254}}'
 
 ## -w <watchfor_file>
 A file containing a list of MAC addresses to watch out for. If the scanner finds an active MAC that is in

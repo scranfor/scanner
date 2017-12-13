@@ -15,7 +15,7 @@ Specify a file conforming to the format of 'nmap-mac-prefixes' to look up vendor
 If this switch is ommitted, no vendor lookup will be performed. 
 
 ## -r <ip_range>
-A range of IP addresses to scan, in the form of a shell brace expansion. <ip_range> MUST BE IN QUOTES!
+A range of IP addresses to scan, in the form of a shell brace expansion. <ip_range> MUST BE IN SINGLE QUOTES!
 example 1: -r '192.168.0.{1..20}'
 example 2: -r '{192.168.{0..255}.{1..254},10.0.{1,2}.{1..254}}'
 
@@ -34,7 +34,7 @@ you a list of their equipment's MAC addresses, so you can differentiate between 
 about and one somebody else handles.
 
 # Common OUIs to exclude:
-00:00:5e - VRRP OUI. You'll find these on the subnet gateway IP, eg x.x.x.254
-5c:5e:ab - Juniper Routers. You'll find these on IPs x.x.x.253/252 acting as the redundant pair for VRRP. 
-00:04:F2 - Polycom VoIP phones
-00:0C:29 - VMware virtual machines, although you probably still want to know about those. 
+* 00:00:5e - VRRP OUI. You'll find these on the subnet gateway IP, eg x.x.x.254
+* 5c:5e:ab - Juniper Routers. You'll find these on IPs x.x.x.253/252 acting as the redundant pair for VRRP. 
+* 00:04:F2 - Polycom VoIP phones
+* 00:0C:29 - VMware virtual machines, although you probably still want to know about those. 

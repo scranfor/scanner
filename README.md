@@ -20,9 +20,9 @@ A very simple example:
 
 `touch empty-file`
 
-`./scanner.sh -a empty-file.txt -o nmap-mac-prefixes -X empty-file.txt -r '192.168.{0..255}.{0..255}' | tee scan-output.txt`
+` ./scanner.sh -a empty-file -w empty-file -e fake@email.tld -o nmap-mac-prefixes -X empty-file -r '172.16.0.{0..255}' | tee scan-output.txt`
 
-This will scan the 65k IP addresses of 192.168.0.0/16. It will take roughly 22 minutes, and will generate roughly 11MB of network traffic.
+This will scan the 65k IP addresses of 192.168.0.0/16. It will take roughly 22 minutes, and will generate roughly 11MB of network traffic. Discovered devices will be printed to the screen and logged in scan-output.txt. Because on most networks 192.168.0.0/16 will be mostly vacant, expect very long stretches of time where nothing is being printed.
 
 # Description of options
 
